@@ -1,22 +1,24 @@
 import { useEffect, useState } from 'react'
+import { useMounted } from './useMounted'
 
-type Theme = 'dark' | 'deep' | 'light'
+type Theme = 'dark' | 'deep'
 
 export const useTheme = () => {
+  const mounted = useMounted()
   const [theme, setTheme] = useState<Theme>('dark')
 
   useEffect(() => {
+    if (!mounted) return
+
     document.documentElement.setAttribute(
       'data-theme',
-      theme === 'dark' ? '' : theme
+      theme === 'dark' ? '' : 'deep'
     )
-  }, [theme])
+  }, [theme, mounted])
 
   return {
     theme,
     toggleTheme: () =>
-      setTheme(t =>
-        t === 'dark' ? 'deep' : t === 'deep' ? 'light' : 'dark'
-      ),
+      setTheme(t => (t === 'dark' ? 'deep' : 'dark')),
   }
 }
