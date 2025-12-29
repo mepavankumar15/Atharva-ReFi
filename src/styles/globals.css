@@ -1,26 +1,365 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Base surfaces */
+  --bg-primary: #050816;      /* almost black, blue-tinted */
+  --bg-surface: #0E1333;      /* deep indigo surface */
+  --bg-elevated: #141A44;     /* cards on hover / focus */
+
+  /* Accents */
+  --accent-primary: #4B5DFF;  /* sharp electric indigo */
+  --accent-secondary: #7C8BFF;
+
+  /* Text */
+  --text-main: #F4F6FF;       /* clean white, not pure */
+  --text-muted: #9AA3D4;      /* cool muted text */
+  --text-subtle: #6F77B5;
+
+  /* Borders & dividers */
+  --border-soft: rgba(154, 163, 212, 0.14);
+}
+[data-theme='deep'] {
+  --bg-primary: #050A1E;
+  --bg-surface: #12113A;
+  --accent: #3F4A88;
+  --muted: #8A88B8;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body{
+  margin: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.card {
+  background: linear-gradient(
+    180deg,
+    var(--bg-surface),
+    #0B102A
+  );
+
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+
+  border: 1px solid var(--border-soft);
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.55);
+}
+.card > *:not(:last-child) {
+  margin-bottom: 12px;
+}
+
+h2, h3 {
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+p {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+button {
+  background: linear-gradient(
+    135deg,
+    var(--accent-primary),
+    var(--accent-secondary)
+  );
+
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+
+  box-shadow:
+    0 4px 16px rgba(75, 93, 255, 0.35);
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 22px rgba(75, 93, 255, 0.45);
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+
+  border-radius: 8px;
+  border: 0.5px solid var(--border-soft);
+
+  background: #070B22;
+  color: var(--text-main);
+
+  font-size: 14px;
+}
+
+input::placeholder {
+  color: var(--text-subtle);
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #1B1A55 25%,
+    #535C91 37%,
+    #1B1A55 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+.skeleton-line {
+  height: 14px;
+  margin-bottom: 10px;
+}
+/* --- Subtle Card Glow --- */
+.glow-card {
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glow-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 12px;
+  background: linear-gradient(
+    120deg,
+    transparent 40%,
+    rgba(146, 144, 195, 0.35),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.glow-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(146, 144, 195, 0.15);
+}
+
+.glow-card:hover::before {
+  opacity: 1;
+}
+@media (max-width: 640px) {
+  main {
+    padding: 16px;
+  }
+
+  .card {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  h3 {
+    font-size: 18px;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  input {
+    font-size: 16px; /* prevents iOS zoom */
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---------- Navbar ---------- */
+
+/* ---------- Navbar ---------- */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
+  background: rgba(5, 8, 22, 0.85);
+  backdrop-filter: blur(10px);
+
+  transition: box-shadow 0.25s ease;
+}
+
+.navbar.scrolled {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+.navbar-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 14px 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* --- Ath Logo Enhancements --- */
+
+.navbar-logo-text {
+  width: 36px;
+  height: 36px;
+
+  border-radius: 9px;
+
+  background: linear-gradient(
+    135deg,
+    #4B5DFF,
+    #7C8BFF
+  );
+
+  color: #050816;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: 0.6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow:
+    0 6px 18px rgba(75, 93, 255, 0.45);
+}
+
+
+.navbar-logo-text:hover {
+  transform: translateY(-1px) scale(1.03);
+  filter: brightness(2.08);
+  box-shadow: 0 6px 18px rgba(146, 144, 195, 0.35);
+}
+
+
+
+.navbar-brand {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--text-main);
+}
+
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar button {
+  background: transparent;
+  border: 1px solid rgba(146, 144, 195, 0.25);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.navbar button:hover {
+  background: rgba(146, 144, 195, 0.15);
+}
+
+.network-badge {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(83, 92, 145, 0.25);
+  border: 1px solid rgba(146, 144, 195, 0.3);
+  color: #9290C3;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .navbar-inner {
+    padding: 12px 16px;
+  }
+
+  .navbar-brand {
+    font-size: 16px;
+  }
+
+  .network-badge {
+    display: none;
+  }
+}
+/* --- Micro Separator --- */
+.separator {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-soft),
+    transparent
+  );
+  margin: 16px 0;
+}
+/* --- Subtle Background Texture --- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+
+  background-image:
+    linear-gradient(
+      rgba(255,255,255,0.015) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0.015) 1px,
+      transparent 1px
+    );
+
+  background-size: 40px 40px;
+  opacity: 0.35;
+  z-index: -1;
 }
