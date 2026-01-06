@@ -1,23 +1,35 @@
-import * as anchor from '@project-serum/anchor'
-import { Program } from '@project-serum/anchor'
+import { AnchorProvider, Program, Idl } from '@project-serum/anchor'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { WalletContextState } from '@solana/wallet-adapter-react'
+import idl from '../constants/atharva_refi.json'
 
-import { getAnchorProvider } from './anchorClient'
-import { IDL } from '../constants/idl'
-import { PROGRAM_ID } from '../constants/addresses'
+// 🔒 Program ID — must match declare_id! in lib.rs
+export const PROGRAM_ID = new PublicKey(
+  '5MQdy7SUtMR5qQqryuizd7WXKE18RRn7sNS4uX64ih96'
+)
 
-export const getProgram = (
-  connection: Connection,
-  wallet?: WalletContextState
-): Program => {
-  const provider = wallet && wallet.publicKey
-    ? getAnchorProvider(connection, wallet)
-    : new anchor.AnchorProvider(
-        connection,
-        {} as any,
-        { preflightCommitment: 'processed' }
-      )
+// 🔌 Devnet connection (stable, confirmed)
+const connection = new Connection(
+  'https://api.devnet.solana.com',
+  'confirmed'
+)
 
-  return new Program(IDL, PROGRAM_ID, provider)
+// Provider factory
+export const getProvider = (wallet: any) => {
+  if (!wallet) throw new Error('Wallet not connected')
+
+  return new AnchorProvider(connection, wallet, {
+    commitment: 'confirmed',
+    preflightCommitment: 'confirmed',
+  })
+}
+
+// Program factory
+export const getProgram = (wallet: any) => {
+  const provider = getProvider(wallet)
+
+  return new Program(
+    idl as unknown as Idl,
+    PROGRAM_ID,
+    provider
+  )
 }

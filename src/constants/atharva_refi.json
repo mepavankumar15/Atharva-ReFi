@@ -1,0 +1,1635 @@
+{
+  "address": "5MQdy7SUtMR5qQqryuizd7WXKE18RRn7sNS4uX64ih96",
+  "metadata": {
+    "name": "atharva_refi",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "create_pool",
+      "discriminator": [
+        233,
+        146,
+        209,
+        142,
+        207,
+        104,
+        64,
+        188
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true,
+          "address": "BkDW9kxJxVC2KGDs94GQRpkowbWfpG1N7sX7HqsNCSL7"
+        },
+        {
+          "name": "msol_mint",
+          "address": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So"
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "organization_pubkey"
+              },
+              {
+                "kind": "arg",
+                "path": "species_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool_mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "organization_pubkey"
+              },
+              {
+                "kind": "arg",
+                "path": "species_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool_vault",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "organization_pubkey"
+              },
+              {
+                "kind": "arg",
+                "path": "species_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "organization_vault",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  103,
+                  97,
+                  110,
+                  105,
+                  122,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "organization_pubkey"
+              },
+              {
+                "kind": "arg",
+                "path": "species_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool_msol_account",
+          "docs": [
+            "mSOL goes here",
+            "Equivalent to Marinade's `mint_to`"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "pool_vault"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "msol_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "organization_name",
+          "type": "string"
+        },
+        {
+          "name": "organization_pubkey",
+          "type": "pubkey"
+        },
+        {
+          "name": "species_name",
+          "type": "string"
+        },
+        {
+          "name": "species_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "delegate",
+      "discriminator": [
+        90,
+        147,
+        75,
+        178,
+        85,
+        88,
+        4,
+        137
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "buffer_pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  117,
+                  102,
+                  102,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                64,
+                169,
+                23,
+                59,
+                30,
+                52,
+                150,
+                20,
+                166,
+                205,
+                162,
+                177,
+                29,
+                44,
+                160,
+                234,
+                42,
+                147,
+                101,
+                166,
+                2,
+                203,
+                226,
+                28,
+                147,
+                248,
+                138,
+                180,
+                153,
+                115,
+                225,
+                173
+              ]
+            }
+          }
+        },
+        {
+          "name": "delegation_record_pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  108,
+                  101,
+                  103,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ],
+            "program": {
+              "kind": "account",
+              "path": "delegation_program"
+            }
+          }
+        },
+        {
+          "name": "delegation_metadata_pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  108,
+                  101,
+                  103,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  45,
+                  109,
+                  101,
+                  116,
+                  97,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ],
+            "program": {
+              "kind": "account",
+              "path": "delegation_program"
+            }
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "owner_program",
+          "address": "5MQdy7SUtMR5qQqryuizd7WXKE18RRn7sNS4uX64ih96"
+        },
+        {
+          "name": "delegation_program",
+          "address": "DELeGGvXpWV2fqJUhqcF5ZSYMS4JTLjteaAMARRSaeSh"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "deposit",
+      "discriminator": [
+        242,
+        35,
+        198,
+        137,
+        82,
+        225,
+        242,
+        182
+      ],
+      "accounts": [
+        {
+          "name": "supporter",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "pool_mint",
+          "writable": true
+        },
+        {
+          "name": "pool_vault",
+          "writable": true
+        },
+        {
+          "name": "supporter_pool_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "supporter"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "pool_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "organization_withdraw",
+      "discriminator": [
+        239,
+        11,
+        106,
+        201,
+        252,
+        40,
+        134,
+        165
+      ],
+      "accounts": [
+        {
+          "name": "organization",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "org_vault",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "process_undelegation",
+      "discriminator": [
+        196,
+        28,
+        41,
+        206,
+        48,
+        37,
+        51,
+        167
+      ],
+      "accounts": [
+        {
+          "name": "base_account",
+          "writable": true
+        },
+        {
+          "name": "buffer"
+        },
+        {
+          "name": "payer",
+          "writable": true
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "account_seeds",
+          "type": {
+            "vec": "bytes"
+          }
+        }
+      ]
+    },
+    {
+      "name": "schedule_streams",
+      "discriminator": [
+        208,
+        142,
+        251,
+        233,
+        70,
+        74,
+        196,
+        172
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "pool_vault",
+          "writable": true
+        },
+        {
+          "name": "organization_vault",
+          "writable": true
+        },
+        {
+          "name": "marinade_state",
+          "writable": true
+        },
+        {
+          "name": "msol_mint",
+          "writable": true
+        },
+        {
+          "name": "liq_pool_sol_leg",
+          "writable": true
+        },
+        {
+          "name": "liq_pool_msol_leg",
+          "writable": true
+        },
+        {
+          "name": "treasury_msol_account",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "marinade_program",
+          "address": "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD"
+        },
+        {
+          "name": "magic_program",
+          "address": "Magic11111111111111111111111111111111111111"
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "ScheduleStreamArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "stake",
+      "discriminator": [
+        206,
+        176,
+        202,
+        18,
+        200,
+        209,
+        179,
+        108
+      ],
+      "accounts": [
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "marinade_state",
+          "docs": [
+            "Marinade state account"
+          ],
+          "writable": true
+        },
+        {
+          "name": "msol_mint",
+          "writable": true
+        },
+        {
+          "name": "liq_pool_sol_leg",
+          "docs": [
+            "Vault to receive deposited SOL from the pool"
+          ],
+          "writable": true
+        },
+        {
+          "name": "liq_pool_msol_leg",
+          "writable": true
+        },
+        {
+          "name": "liq_pool_msol_leg_authority",
+          "docs": [
+            "Signs token operations during CPI."
+          ]
+        },
+        {
+          "name": "reserve_pda",
+          "docs": [
+            "Holds long-term staked SOL backing mSOL supply"
+          ],
+          "writable": true
+        },
+        {
+          "name": "pool_vault",
+          "docs": [
+            "SOL comes out of here",
+            "Equivalent to Marinade's `transfer_from`"
+          ],
+          "writable": true
+        },
+        {
+          "name": "pool_msol_account",
+          "docs": [
+            "mSOL goes here",
+            "Equivalent to Marinade's `mint_to`"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "pool_vault"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "msol_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "msol_mint_authority",
+          "docs": [
+            "Signs the mint CPI that issues mSOL."
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "marinade_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "stream",
+      "discriminator": [
+        163,
+        138,
+        126,
+        189,
+        156,
+        146,
+        188,
+        194
+      ],
+      "accounts": [
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "organization_vault",
+          "writable": true
+        },
+        {
+          "name": "marinade_state",
+          "writable": true
+        },
+        {
+          "name": "msol_mint",
+          "writable": true
+        },
+        {
+          "name": "liq_pool_sol_leg",
+          "docs": [
+            "Vault to receive SOL from unstake"
+          ],
+          "writable": true
+        },
+        {
+          "name": "liq_pool_msol_leg",
+          "writable": true
+        },
+        {
+          "name": "treasury_msol_account",
+          "docs": [
+            "Holds mSOL backing SOL"
+          ],
+          "writable": true
+        },
+        {
+          "name": "pool_msol_account",
+          "docs": [
+            "mSOL token account to burn from",
+            "Equivalent of `get_msol_from`"
+          ],
+          "writable": true
+        },
+        {
+          "name": "pool_vault",
+          "docs": [
+            "Signs burn CPI and receives SOL from unstake",
+            "Must be authority of `get_msol_from`",
+            "Used for recieving SOL - `transfer_sol_to`"
+          ],
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "marinade_program",
+          "address": "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "supporter_withdraw",
+      "discriminator": [
+        219,
+        137,
+        94,
+        153,
+        21,
+        170,
+        95,
+        30
+      ],
+      "accounts": [
+        {
+          "name": "supporter",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "pool_mint",
+          "docs": [
+            "Pool token mint (share tokens)"
+          ],
+          "writable": true
+        },
+        {
+          "name": "supporter_pool_token_account",
+          "docs": [
+            "Supporter's pool token account (their share tokens)"
+          ],
+          "writable": true
+        },
+        {
+          "name": "marinade_state",
+          "docs": [
+            "Marinade state account"
+          ],
+          "writable": true
+        },
+        {
+          "name": "msol_mint",
+          "writable": true
+        },
+        {
+          "name": "liq_pool_sol_leg",
+          "docs": [
+            "Vault to receive SOL from unstake"
+          ],
+          "writable": true
+        },
+        {
+          "name": "liq_pool_msol_leg",
+          "writable": true
+        },
+        {
+          "name": "treasury_msol_account",
+          "docs": [
+            "Holds mSOL backing SOL"
+          ],
+          "writable": true
+        },
+        {
+          "name": "pool_msol_account",
+          "docs": [
+            "mSOL token account to burn from",
+            "Equivalent of `get_msol_from`"
+          ],
+          "writable": true
+        },
+        {
+          "name": "pool_vault",
+          "docs": [
+            "Signs burn CPI and receives SOL from unstake",
+            "Must be authority of `get_msol_from`",
+            "Used for recieving SOL - `transfer_sol_to`"
+          ],
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "marinade_program",
+          "address": "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD"
+        }
+      ],
+      "args": [
+        {
+          "name": "share_amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "undelegate",
+      "discriminator": [
+        131,
+        148,
+        180,
+        198,
+        91,
+        104,
+        42,
+        238
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "magic_program",
+          "address": "Magic11111111111111111111111111111111111111"
+        },
+        {
+          "name": "magic_context",
+          "writable": true,
+          "address": "MagicContext1111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unstake",
+      "discriminator": [
+        90,
+        95,
+        107,
+        42,
+        205,
+        124,
+        50,
+        225
+      ],
+      "accounts": [
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "marinade_state",
+          "writable": true
+        },
+        {
+          "name": "msol_mint",
+          "writable": true
+        },
+        {
+          "name": "liq_pool_sol_leg",
+          "docs": [
+            "Vault to receive SOL from unstake"
+          ],
+          "writable": true
+        },
+        {
+          "name": "liq_pool_msol_leg",
+          "writable": true
+        },
+        {
+          "name": "treasury_msol_account",
+          "docs": [
+            "Holds mSOL backing SOL"
+          ],
+          "writable": true
+        },
+        {
+          "name": "pool_msol_account",
+          "docs": [
+            "mSOL token account to burn from",
+            "Equivalent of `get_msol_from`"
+          ],
+          "writable": true
+        },
+        {
+          "name": "pool_vault",
+          "docs": [
+            "Signs burn CPI and receives SOL from unstake",
+            "Must be authority of `get_msol_from`",
+            "Used for recieving SOL - `transfer_sol_to`"
+          ],
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "marinade_program",
+          "address": "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Pool",
+      "discriminator": [
+        241,
+        154,
+        109,
+        4,
+        17,
+        177,
+        109,
+        188
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "PoolCreated",
+      "discriminator": [
+        202,
+        44,
+        41,
+        88,
+        104,
+        220,
+        157,
+        82
+      ]
+    },
+    {
+      "name": "SupporterDeposited",
+      "discriminator": [
+        125,
+        102,
+        234,
+        135,
+        117,
+        203,
+        120,
+        88
+      ]
+    },
+    {
+      "name": "SupporterWithdrew",
+      "discriminator": [
+        99,
+        181,
+        115,
+        250,
+        201,
+        212,
+        178,
+        136
+      ]
+    },
+    {
+      "name": "YieldStreamed",
+      "discriminator": [
+        77,
+        157,
+        72,
+        12,
+        151,
+        105,
+        226,
+        21
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "CreatePoolUnauthorized",
+      "msg": "Unauthorized to create pool. Only the designated admin can."
+    },
+    {
+      "code": 6001,
+      "name": "StakingUnauthorized",
+      "msg": "Unauthorized to stake. Only the designated organization or admin can."
+    },
+    {
+      "code": 6002,
+      "name": "UnauthorizedStream",
+      "msg": "Instruction must be signed by the Organization or triggered by the MagicBlock Crank"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidOrganizationAuthority",
+      "msg": "The provided authority does not match the organization's public key"
+    },
+    {
+      "code": 6004,
+      "name": "UnauthorizedOrganization",
+      "msg": "Only the organization can withdraw"
+    },
+    {
+      "code": 6005,
+      "name": "MathError",
+      "msg": "Arithmetic overflow"
+    },
+    {
+      "code": 6006,
+      "name": "PoolNotActive",
+      "msg": "Pool is currently not active"
+    },
+    {
+      "code": 6007,
+      "name": "InsufficientFunds",
+      "msg": "Not enough SOL to deposit"
+    },
+    {
+      "code": 6008,
+      "name": "InsufficientWithdrawFunds",
+      "msg": "Not enough SOL to withdraw"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidAmount",
+      "msg": "Invalid amount"
+    },
+    {
+      "code": 6010,
+      "name": "AmountTooSmall",
+      "msg": "Amount is too small"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidStringLength",
+      "msg": "Input string exceeds the maximum allowed length"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidInput",
+      "msg": "Invalid input parameters"
+    },
+    {
+      "code": 6013,
+      "name": "MarinadeProgramError",
+      "msg": "Unmatched Program Key"
+    },
+    {
+      "code": 6014,
+      "name": "SettlementTooFrequent",
+      "msg": "Settlement can only occur once per day"
+    },
+    {
+      "code": 6015,
+      "name": "YieldTooSmall",
+      "msg": "Yield amount too small to settle"
+    },
+    {
+      "code": 6016,
+      "name": "InvalidYieldPercentage",
+      "msg": "Invalid yield percentage"
+    },
+    {
+      "code": 6017,
+      "name": "InvalidMarinadeState",
+      "msg": "Invalid Marinade state account"
+    },
+    {
+      "code": 6018,
+      "name": "InvalidMsolAccount",
+      "msg": "Invalid mSOL account"
+    },
+    {
+      "code": 6019,
+      "name": "InvalidMsolMint",
+      "msg": "Invalid mSOL mint"
+    },
+    {
+      "code": 6020,
+      "name": "InvalidMagicProgram",
+      "msg": "Invalid Magic Program account provided"
+    },
+    {
+      "code": 6021,
+      "name": "IntervalTooShort",
+      "msg": "Execution interval too short (minimum required interval not met)"
+    },
+    {
+      "code": 6022,
+      "name": "InvalidIterations",
+      "msg": "Iterations count must be greater than zero"
+    },
+    {
+      "code": 6023,
+      "name": "SerializationError",
+      "msg": "Failed to serialize MagicBlock instruction data"
+    },
+    {
+      "code": 6024,
+      "name": "CrankAlreadyScheduled",
+      "msg": "Crank automation is already scheduled for this pool"
+    },
+    {
+      "code": 6025,
+      "name": "InsufficientShares",
+      "msg": "Insufficient shares to withdraw requested amount"
+    },
+    {
+      "code": 6026,
+      "name": "PoolEmpty",
+      "msg": "Pool currently has no liquidity"
+    },
+    {
+      "code": 6027,
+      "name": "InvalidTokenAccount",
+      "msg": "Invalid token account provided"
+    }
+  ],
+  "types": [
+    {
+      "name": "Pool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "organization_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "organization_name",
+            "type": "string"
+          },
+          {
+            "name": "organization_yield_bps",
+            "docs": [
+              "Store as percentage (20 = 20%)",
+              "Converted to basis points (bps) in calculations"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "species_name",
+            "type": "string"
+          },
+          {
+            "name": "species_id",
+            "type": "string"
+          },
+          {
+            "name": "new_species_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "last_streamed_vault_sol",
+            "type": "u64"
+          },
+          {
+            "name": "last_stream_ts",
+            "type": "u64"
+          },
+          {
+            "name": "total_deposits",
+            "type": "u64"
+          },
+          {
+            "name": "total_shares",
+            "type": "u64"
+          },
+          {
+            "name": "is_active",
+            "type": "bool"
+          },
+          {
+            "name": "is_crank_scheduled",
+            "type": "bool"
+          },
+          {
+            "name": "pool_bump",
+            "type": "u8"
+          },
+          {
+            "name": "org_vault_bump",
+            "type": "u8"
+          },
+          {
+            "name": "pool_vault_bump",
+            "type": "u8"
+          },
+          {
+            "name": "pool_mint_bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PoolCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "organization_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "organization_name",
+            "type": "string"
+          },
+          {
+            "name": "species_name",
+            "type": "string"
+          },
+          {
+            "name": "species_id",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ScheduleStreamArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "task_id",
+            "type": "u64"
+          },
+          {
+            "name": "execution_interval_millis",
+            "type": "u64"
+          },
+          {
+            "name": "iterations",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SupporterDeposited",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "organization_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "species_name",
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SupporterWithdrew",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "supporter",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "share_amount",
+            "type": "u64"
+          },
+          {
+            "name": "msol_amount",
+            "type": "u64"
+          },
+          {
+            "name": "sol_amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "YieldStreamed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "organization",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_yield",
+            "type": "u64"
+          },
+          {
+            "name": "org_amount",
+            "type": "u64"
+          },
+          {
+            "name": "pool_amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}

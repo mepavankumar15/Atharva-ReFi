@@ -1,34 +1,39 @@
-import { BN } from '@project-serum/anchor'
-import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+import BN from 'bn.js'
+import { LAMPORTS_PER_SOL, SystemProgram , PublicKey } from '@solana/web3.js'
 import { getProgram } from './program'
 import {
-  POOL_PDA,
-  VAULT_PDA,
-  LP_MINT,
+  getPoolPda,
+  getPoolVaultPda,
 } from '../constants/addresses'
 
-export const stakeSol = async (
-  connection: any,
+export const stake = async (
   wallet: any,
-  amountSol: number
-) => {
-  if (!wallet.publicKey) {
-    throw new Error('Wallet not connected')
+  amountSol: number,
+  organizationPubkey: PublicKey,
+  speciesId: Uint8Array,
+  marinadeAccounts: {
+    marinadeState: PublicKey
+    msolMint: PublicKey
+    liqPoolSolLeg: PublicKey
+    liqPoolMsolLeg: PublicKey
+    liqPoolMsolLegAuthority: PublicKey
+    reservePda: PublicKey
+    msolMintAuthority: PublicKey
+    marinadeProgram: PublicKey
   }
+) => {
+  const program = getProgram(wallet)
 
-  const program = getProgram(connection, wallet)
+  const [pool] = getPoolPda(organizationPubkey, speciesId)
+  const [poolVault] = getPoolVaultPda(organizationPubkey, speciesId)
 
-  const amountLamports = new BN(amountSol * 1_000_000_000)
-
-  const tx = await program.methods
-    .stake(amountLamports)
+  await program.methods
+    .stake(new BN(amountSol * LAMPORTS_PER_SOL))
     .accounts({
-      user: wallet.publicKey,
-      pool: POOL_PDA,
-      vault: VAULT_PDA,
-      lpMint: LP_MINT,
+      pool,
+      poolVault,
+      ...marinadeAccounts,
+      systemProgram: SystemProgram.programId,
     })
     .rpc()
-
-  return tx
 }

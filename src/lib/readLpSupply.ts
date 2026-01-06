@@ -1,14 +1,14 @@
 import { getMint } from '@solana/spl-token'
-import { LP_MINT } from '../constants/addresses'
+import { Connection, PublicKey } from '@solana/web3.js'
 
 export const getTotalLpSupply = async (
-  connection: any
+  connection: Connection,
+  poolMint: PublicKey
 ): Promise<number | null> => {
   try {
-    const mint = await getMint(connection, LP_MINT)
+    const mint = await getMint(connection, poolMint)
     return Number(mint.supply) / 1e9
   } catch {
-    // LP mint not deployed yet
     return null
   }
 }

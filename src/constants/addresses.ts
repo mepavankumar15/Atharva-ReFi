@@ -1,13 +1,38 @@
 import { PublicKey } from '@solana/web3.js'
+import { PROGRAM_ID } from '../lib/program'
 
-// Temporary valid placeholder (safe for dev)
-const DUMMY_PUBKEY = new PublicKey(
-  '11111111111111111111111111111111'
-)
+// ===== Seeds (MUST MATCH BACKEND EXACTLY) =====
+export const POOL_SEED = 'pool'
+export const POOL_VAULT_SEED = 'pool_vault'
+export const POOL_MINT_SEED = 'pool_mint'
+export const ORG_VAULT_SEED = 'organization_vault'
 
-// Program + Accounts (replace when backend is ready)
-export const PROGRAM_ID = DUMMY_PUBKEY
-export const GLOBAL_STATE_PDA = DUMMY_PUBKEY
-export const POOL_PDA = DUMMY_PUBKEY
-export const VAULT_PDA = DUMMY_PUBKEY
-export const LP_MINT = DUMMY_PUBKEY
+// ===== PDA DERIVATIONS =====
+
+// Pool PDA
+export const getPoolPda = (
+  organizationPubkey: PublicKey,
+  speciesId: Uint8Array // MUST be 32 bytes
+) =>
+  PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(POOL_SEED),
+      organizationPubkey.toBuffer(),
+      Buffer.from(speciesId),
+    ],
+    PROGRAM_ID
+  )
+
+// Pool SOL Vault PDA
+export const getPoolVaultPda = (
+  organizationPubkey: PublicKey,
+  speciesId: Uint8Array
+) =>
+  PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(POOL_VAULT_SEED),
+      organizationPubkey.toBuffer(),
+      Buffer.from(speciesId),
+    ],
+    PROGRAM_ID
+  )

@@ -1,13 +1,14 @@
 import { getAssociatedTokenAddress } from '@solana/spl-token'
-import { LP_MINT } from '../constants/addresses'
+import { PublicKey, Connection } from '@solana/web3.js'
 
 export const getLpBalance = async (
-  connection: any,
-  userPubkey: any
-) => {
+  connection: Connection,
+  userPubkey: PublicKey,
+  poolMint: PublicKey
+): Promise<number> => {
   try {
     const ata = await getAssociatedTokenAddress(
-      LP_MINT,
+      poolMint,
       userPubkey
     )
 

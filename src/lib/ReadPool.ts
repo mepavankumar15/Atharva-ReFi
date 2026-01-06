@@ -1,21 +1,20 @@
 import { PublicKey } from '@solana/web3.js'
 import { getProgram } from './program'
-import { POOL_PDA } from '../constants/addresses'
+import { getPoolPda } from '../constants/addresses'
 
-export const fetchPoolState = async (
-  connection: any,
-  wallet?: any
+export const fetchPool = async (
+  wallet: any,
+  organizationPubkey: PublicKey,
+  speciesId: Uint8Array
 ) => {
+  const program = getProgram(wallet)
+  const [poolPda] = getPoolPda(organizationPubkey, speciesId)
+
   try {
-    const program = getProgram(connection, wallet)
-
-    const poolAccount = await program.account.speciesPool.fetch(
-      POOL_PDA
-    )
-
-    return poolAccount
+    const pool = await program.account.pool.fetch(poolPda)
+    return pool
   } catch (err) {
-    console.warn('Pool not ready yet', err)
+    // Pool does not exist OR not initialized
     return null
   }
 }
