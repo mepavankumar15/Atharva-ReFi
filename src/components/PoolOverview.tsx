@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useConnection } from '@solana/wallet-adapter-react'
 import { PublicKey } from '@solana/web3.js'
 
-import { fetchPool } from '../lib/ReadPool'
+import { fetchPoolState } from '../lib/ReadPool'
 import { useAutoRefresh } from '../lib/useAutoRefresh'
 import { useAnimatedNumber } from '../lib/useAnimatedNumbers'
 import { explorerAddress } from '../lib/explorer'
@@ -18,29 +18,19 @@ export default function PoolOverview({
 }: Props) {
   const { connection } = useConnection()
 
-  const [totalStakedSol, setTotalStakedSol] = useState(0)
-  const [yieldBps, setYieldBps] = useState<number | null>(null)
-  const [vault, setVault] = useState<string | null>(null)
-  const [speciesName, setSpeciesName] = useState<string>('Conservation Pool')
+  const [pool, setPool] = useState<any | null>(null)
   const [loading, setLoading] = useState(true)
 
   const refresh = async () => {
     try {
-      const pool = await fetchPool(
+      const result = await fetchPoolState(
         { connection },
+        null,
         organizationPubkey,
         speciesId
       )
 
-      if (!pool) {
-        setLoading(false)
-        return
-      }
-
-      setTotalStakedSol(Number(pool.totalDeposits) / 1e9)
-      setYieldBps(pool.organizationYieldBps)
-      setVault(pool.vault.toBase58())
-      setSpeciesName(pool.speciesName)
+      setPool(result ?? null)
     } finally {
       setLoading(false)
     }
@@ -48,13 +38,41 @@ export default function PoolOverview({
 
   useAutoRefresh(refresh)
 
-  // Animated values
+  // -------------------------
+  // POOL NOT INITIALIZED
+  // -------------------------
+  const poolInitialized =
+    pool &&
+    typeof pool === 'object' &&
+    'totalDeposits' in pool &&
+    'organizationYieldBps' in pool
+
+  // -------------------------
+  // DUMMY VALUES
+  // -------------------------
+  const totalStakedSol = poolInitialized
+    ? Number(pool.totalDeposits) / 1e9
+    : 0
+
+  const yieldBps = poolInitialized
+    ? pool.organizationYieldBps
+    : 20 // default dummy %
+
+  const vault = poolInitialized && pool.vault
+    ? pool.vault.toBase58()
+    : null
+
+  const speciesName = poolInitialized && pool.speciesName
+    ? pool.speciesName
+    : 'Conservation Pool (Not Live Yet)'
+
+  // -------------------------
+  // ANIMATIONS
+  // -------------------------
   const animatedStaked = useAnimatedNumber(totalStakedSol)
 
-  const userPct =
-    yieldBps !== null ? 100 - yieldBps : 0
-  const conservationPct =
-    yieldBps !== null ? yieldBps : 0
+  const userPct = 100 - yieldBps
+  const conservationPct = yieldBps
 
   const animatedUserPct = useAnimatedNumber(userPct)
   const animatedConservationPct = useAnimatedNumber(conservationPct)
@@ -75,18 +93,25 @@ export default function PoolOverview({
         <>
           <p>
             Total Staked:{' '}
-            <strong>{animatedStaked.toFixed(2)} SOL</strong>
+            <strong>
+              {animatedStaked.toFixed(2)} SOL
+              {!poolInitialized && ' (preview)'}
+            </strong>
           </p>
 
           <p>Yield Source: Marinade (mSOL)</p>
 
-          {yieldBps !== null && (
-            <p>
-              Yield Split:{' '}
-              <strong>
-                {animatedUserPct.toFixed(0)}% Users /{' '}
-                {animatedConservationPct.toFixed(0)}% Conservation
-              </strong>
+          <p>
+            Yield Split:{' '}
+            <strong>
+              {animatedUserPct.toFixed(0)}% Users /{' '}
+              {animatedConservationPct.toFixed(0)}% Conservation
+            </strong>
+          </p>
+
+          {!poolInitialized && (
+            <p style={{ color: '#9290C3' }}>
+              Pool not initialized on-chain yet
             </p>
           )}
 

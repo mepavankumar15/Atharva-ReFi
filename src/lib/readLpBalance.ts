@@ -1,5 +1,5 @@
 import { getAssociatedTokenAddress } from '@solana/spl-token'
-import { PublicKey, Connection } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 
 export const getLpBalance = async (
   connection: Connection,
@@ -12,7 +12,9 @@ export const getLpBalance = async (
       userPubkey
     )
 
-    const account = await connection.getTokenAccountBalance(ata)
+    const account =
+      await connection.getTokenAccountBalance(ata)
+
     return Number(account.value.amount) / 1e9
   } catch {
     return 0

@@ -9,8 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@coral-xyz/anchor": "^0.29.0",
     "@project-serum/anchor": "^0.26.0",
-    "@solana/spl-token": "^0.4.14",
+    "@solana/spl-token": "^0.4.8",
     "@solana/wallet-adapter-react": "^0.15.39",
     "@solana/wallet-adapter-react-ui": "^0.9.39",
     "@solana/wallet-adapter-wallets": "^0.19.37",

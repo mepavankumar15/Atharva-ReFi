@@ -1,35 +1,43 @@
-import { AnchorProvider, Program, Idl } from '@project-serum/anchor'
+// src/lib/program.ts
+import { Program, AnchorProvider } from '@coral-xyz/anchor'
 import { Connection, PublicKey } from '@solana/web3.js'
-import idl from '../constants/atharva_refi.json'
+import { WalletContextState } from '@solana/wallet-adapter-react'
+import { ATHARVA_IDL } from '../idl/atharva_refi'
 
-// 🔒 Program ID — must match declare_id! in lib.rs
 export const PROGRAM_ID = new PublicKey(
   '5MQdy7SUtMR5qQqryuizd7WXKE18RRn7sNS4uX64ih96'
 )
 
-// 🔌 Devnet connection (stable, confirmed)
-const connection = new Connection(
-  'https://api.devnet.solana.com',
-  'confirmed'
-)
+/**
+ * READ + WRITE safe Program factory
+ */
+export const getProgram = (
+  connection: Connection,
+  wallet?: WalletContextState | null
+) => {
+  // 🔹 READ-ONLY provider (no wallet)
+  const provider = wallet?.publicKey &&
+    wallet.signTransaction &&
+    wallet.signAllTransactions
+    ? new AnchorProvider(
+        connection,
+        {
+          publicKey: wallet.publicKey,
+          signTransaction: wallet.signTransaction,
+          signAllTransactions: wallet.signAllTransactions,
+        },
+        { commitment: 'confirmed' }
+      )
+    : new AnchorProvider(
+        connection,
+        // dummy wallet for READ-ONLY
+        {
+          publicKey: PublicKey.default,
+          signTransaction: async (tx) => tx,
+          signAllTransactions: async (txs) => txs,
+        },
+        { commitment: 'confirmed' }
+      )
 
-// Provider factory
-export const getProvider = (wallet: any) => {
-  if (!wallet) throw new Error('Wallet not connected')
-
-  return new AnchorProvider(connection, wallet, {
-    commitment: 'confirmed',
-    preflightCommitment: 'confirmed',
-  })
-}
-
-// Program factory
-export const getProgram = (wallet: any) => {
-  const provider = getProvider(wallet)
-
-  return new Program(
-    idl as unknown as Idl,
-    PROGRAM_ID,
-    provider
-  )
+  return new Program<any>(ATHARVA_IDL, PROGRAM_ID, provider)
 }

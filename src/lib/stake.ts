@@ -3,6 +3,7 @@ import {
   LAMPORTS_PER_SOL,
   SystemProgram,
   PublicKey,
+  Connection,
 } from '@solana/web3.js'
 import { getAssociatedTokenAddress } from '@solana/spl-token'
 import { getProgram } from './program'
@@ -10,6 +11,7 @@ import {
   getPoolPda,
   getPoolVaultPda,
 } from '../constants/addresses'
+import { connect } from 'http2'
 
 export type MarinadeStakeAccounts = {
   marinadeState: PublicKey
@@ -23,6 +25,7 @@ export type MarinadeStakeAccounts = {
 }
 
 export const stake = async (
+  connection: Connection,
   wallet: any,
   amountSol: number,
   organizationPubkey: PublicKey,
@@ -37,7 +40,7 @@ export const stake = async (
     throw new Error('Invalid stake amount')
   }
 
-  const program = getProgram(wallet)
+  const program = getProgram(connection ,wallet)
 
   const [pool] = getPoolPda(organizationPubkey, speciesId)
   const [poolVault] = getPoolVaultPda(organizationPubkey, speciesId)
@@ -67,9 +70,7 @@ export const stake = async (
       poolMsolAccount, // ✅ REQUIRED
       msolMintAuthority: marinade.msolMintAuthority,
       systemProgram: SystemProgram.programId,
-      tokenProgram: program.provider.connection
-        ? undefined
-        : undefined, // safe to omit
+       // safe to omit
       marinadeProgram: marinade.marinadeProgram,
     })
     .rpc()

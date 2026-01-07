@@ -1,11 +1,12 @@
 import BN from 'bn.js'
-import { SystemProgram, PublicKey } from '@solana/web3.js'
+import { SystemProgram, PublicKey ,Connection } from '@solana/web3.js'
 import { getAssociatedTokenAddress } from '@solana/spl-token'
 import { getProgram } from './program'
 import {
   getPoolPda,
   getPoolVaultPda,
 } from '../constants/addresses'
+import { connection } from 'next/server'
 
 export type MarinadeUnstakeAccounts = {
   marinadeState: PublicKey
@@ -17,6 +18,7 @@ export type MarinadeUnstakeAccounts = {
 }
 
 export const unstake = async (
+  connection: Connection,
   wallet: any,
   msolAmount: number,
   organizationPubkey: PublicKey,
@@ -28,7 +30,7 @@ export const unstake = async (
     throw new Error('Wallet not connected')
   }
 
-  const program = getProgram(wallet)
+  const program = getProgram(connection ,wallet)
 
   const [pool] = getPoolPda(organizationPubkey, speciesId)
   const [poolVault] = getPoolVaultPda(organizationPubkey, speciesId)

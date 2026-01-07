@@ -7,7 +7,7 @@ export type PoolAccount = {
 
   speciesName: string
   speciesId: string
-  newSpeciesId: Uint8Array
+  newSpeciesId: number[]
 
   vault: PublicKey
   poolMint: PublicKey
@@ -26,3 +26,4 @@ export type PoolAccount = {
   poolVaultBump: number
   poolMintBump: number
 }
+
