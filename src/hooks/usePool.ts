@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
-import { PublicKey } from '@solana/web3.js'
-import { fetchPool } from '../lib/ReadPool'
+import { Connection, PublicKey } from '@solana/web3.js'
+import { fetchPoolState } from '../lib/ReadPool'
+import { connect } from 'http2'
+
 
 export const usePool = (
+  connection: Connection,
   wallet: any,
   organizationPubkey: PublicKey,
   speciesId: Uint8Array
@@ -26,10 +29,11 @@ export const usePool = (
     const load = async () => {
       setState({ loading: true, pool: null })
 
-      const pool = await fetchPool(
+      const pool = await fetchPoolState(
+        connection,
         wallet,
         organizationPubkey,
-        speciesId
+        speciesId,
       )
 
       if (!cancelled) {
