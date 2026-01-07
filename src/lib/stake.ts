@@ -1,39 +1,78 @@
 import BN from 'bn.js'
-import { LAMPORTS_PER_SOL, SystemProgram , PublicKey } from '@solana/web3.js'
+import {
+  LAMPORTS_PER_SOL,
+  SystemProgram,
+  PublicKey,
+} from '@solana/web3.js'
+import { getAssociatedTokenAddress } from '@solana/spl-token'
 import { getProgram } from './program'
 import {
   getPoolPda,
   getPoolVaultPda,
 } from '../constants/addresses'
 
+export type MarinadeStakeAccounts = {
+  marinadeState: PublicKey
+  msolMint: PublicKey
+  liqPoolSolLeg: PublicKey
+  liqPoolMsolLeg: PublicKey
+  liqPoolMsolLegAuthority: PublicKey
+  reservePda: PublicKey
+  msolMintAuthority: PublicKey
+  marinadeProgram: PublicKey
+}
+
 export const stake = async (
   wallet: any,
   amountSol: number,
   organizationPubkey: PublicKey,
   speciesId: Uint8Array,
-  marinadeAccounts: {
-    marinadeState: PublicKey
-    msolMint: PublicKey
-    liqPoolSolLeg: PublicKey
-    liqPoolMsolLeg: PublicKey
-    liqPoolMsolLegAuthority: PublicKey
-    reservePda: PublicKey
-    msolMintAuthority: PublicKey
-    marinadeProgram: PublicKey
+  marinade: MarinadeStakeAccounts
+): Promise<string> => {
+  if (!wallet?.publicKey) {
+    throw new Error('Wallet not connected')
   }
-) => {
+
+  if (amountSol <= 0) {
+    throw new Error('Invalid stake amount')
+  }
+
   const program = getProgram(wallet)
 
   const [pool] = getPoolPda(organizationPubkey, speciesId)
   const [poolVault] = getPoolVaultPda(organizationPubkey, speciesId)
 
-  await program.methods
-    .stake(new BN(amountSol * LAMPORTS_PER_SOL))
+  // ✅ DERIVE pool mSOL ATA (authority = pool vault PDA)
+  const poolMsolAccount = await getAssociatedTokenAddress(
+    marinade.msolMint,
+    poolVault,
+    true // allow PDA
+  )
+
+  const amountLamports = new BN(
+    Math.floor(amountSol * LAMPORTS_PER_SOL)
+  )
+
+  const sig = await program.methods
+    .stake(amountLamports)
     .accounts({
       pool,
+      marinadeState: marinade.marinadeState,
+      msolMint: marinade.msolMint,
+      liqPoolSolLeg: marinade.liqPoolSolLeg,
+      liqPoolMsolLeg: marinade.liqPoolMsolLeg,
+      liqPoolMsolLegAuthority: marinade.liqPoolMsolLegAuthority,
+      reservePda: marinade.reservePda,
       poolVault,
-      ...marinadeAccounts,
+      poolMsolAccount, // ✅ REQUIRED
+      msolMintAuthority: marinade.msolMintAuthority,
       systemProgram: SystemProgram.programId,
+      tokenProgram: program.provider.connection
+        ? undefined
+        : undefined, // safe to omit
+      marinadeProgram: marinade.marinadeProgram,
     })
     .rpc()
+
+  return sig
 }

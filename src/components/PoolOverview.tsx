@@ -1,60 +1,67 @@
-import { useEffect, useState } from 'react'
-import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+import { useState } from 'react'
+import { useConnection } from '@solana/wallet-adapter-react'
+import { PublicKey } from '@solana/web3.js'
 
-import { fetchPoolState } from '../lib/ReadPool'
-import { fetchGlobalState } from '../lib/ReadGlobal'
+import { fetchPool } from '../lib/ReadPool'
 import { useAutoRefresh } from '../lib/useAutoRefresh'
 import { useAnimatedNumber } from '../lib/useAnimatedNumbers'
 import { explorerAddress } from '../lib/explorer'
 
-export default function PoolOverview() {
+type Props = {
+  organizationPubkey: PublicKey
+  speciesId: Uint8Array
+}
+
+export default function PoolOverview({
+  organizationPubkey,
+  speciesId,
+}: Props) {
   const { connection } = useConnection()
-  const wallet = useWallet()
 
   const [totalStakedSol, setTotalStakedSol] = useState(0)
   const [yieldBps, setYieldBps] = useState<number | null>(null)
-  const [treasury, setTreasury] = useState<string | null>(null)
+  const [vault, setVault] = useState<string | null>(null)
+  const [speciesName, setSpeciesName] = useState<string>('Conservation Pool')
   const [loading, setLoading] = useState(true)
 
   const refresh = async () => {
     try {
-      const [pool, global] = await Promise.all([
-        fetchPoolState(connection, wallet),
-        fetchGlobalState(connection, wallet),
-      ])
+      const pool = await fetchPool(
+        { connection },
+        organizationPubkey,
+        speciesId
+      )
 
-      if (pool?.totalStaked) {
-        setTotalStakedSol(Number(pool.totalStaked) / 1e9)
+      if (!pool) {
+        setLoading(false)
+        return
       }
 
-      if (global?.yieldBps !== undefined) {
-        setYieldBps(global.yieldBps)
-      }
-
-      if (global?.treasury) {
-        setTreasury(global.treasury.toBase58())
-      }
-
-      setLoading(false)
-    } catch {
+      setTotalStakedSol(Number(pool.totalDeposits) / 1e9)
+      setYieldBps(pool.organizationYieldBps)
+      setVault(pool.vault.toBase58())
+      setSpeciesName(pool.speciesName)
+    } finally {
       setLoading(false)
     }
   }
 
   useAutoRefresh(refresh)
 
-  // 🔹 Animated values
+  // Animated values
   const animatedStaked = useAnimatedNumber(totalStakedSol)
-  const animatedUserPct = useAnimatedNumber(
-    yieldBps !== null ? 100 - yieldBps / 100 : 0
-  )
-  const animatedConservationPct = useAnimatedNumber(
-    yieldBps !== null ? yieldBps / 100 : 0
-  )
+
+  const userPct =
+    yieldBps !== null ? 100 - yieldBps : 0
+  const conservationPct =
+    yieldBps !== null ? yieldBps : 0
+
+  const animatedUserPct = useAnimatedNumber(userPct)
+  const animatedConservationPct = useAnimatedNumber(conservationPct)
 
   return (
     <div className="card">
-      <h3>🐯 Tiger Conservation Pool</h3>
+      <h3>{speciesName}</h3>
 
       {loading && (
         <>
@@ -83,11 +90,11 @@ export default function PoolOverview() {
             </p>
           )}
 
-          {treasury && (
+          {vault && (
             <p>
-              Treasury:{' '}
+              Pool Vault:{' '}
               <a
-                href={explorerAddress(treasury)}
+                href={explorerAddress(vault)}
                 target="_blank"
                 rel="noreferrer"
               >

@@ -1,42 +1,76 @@
 import { useEffect, useState } from 'react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { stakeSol } from '../lib/stake'
-import { withdrawSol } from '../lib/withdraw'
+import { PublicKey } from '@solana/web3.js'
+
+import { stake } from '../lib/stake'
+import { unstake } from '../lib/unstake'
 import { getLpBalance } from '../lib/readLpBalance'
 import { explorerTx } from '../lib/explorer'
+import { MarinadeAccounts } from '../lib/loadMarinadeAccounts'
 
-export default function StakeWithdraw() {
+type Props = {
+  poolMint: PublicKey
+  organizationPubkey: PublicKey
+  speciesId: Uint8Array
+  marinade: MarinadeAccounts | null
+}
+
+export default function StakeWithdraw({
+  poolMint,
+  organizationPubkey,
+  speciesId,
+  marinade,
+}: Props) {
   const { connection } = useConnection()
   const wallet = useWallet()
 
   const [stakeAmt, setStakeAmt] = useState('')
-  const [withdrawAmt, setWithdrawAmt] = useState('')
-  const [lpBalance, setLpBalance] = useState<number>(0)
+  const [unstakeAmt, setUnstakeAmt] = useState('')
+  const [lpBalance, setLpBalance] = useState(0)
   const [txLink, setTxLink] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!wallet.publicKey) return
-    getLpBalance(connection, wallet.publicKey).then(setLpBalance)
-  }, [connection, wallet.publicKey, txLink])
+    if (!wallet.publicKey || !poolMint) return
+
+    getLpBalance(connection, wallet.publicKey, poolMint)
+      .then(setLpBalance)
+      .catch(() => setLpBalance(0))
+  }, [connection, wallet.publicKey, poolMint, txLink])
 
   const handleStake = async () => {
-    if (!stakeAmt) return
+    if (!stakeAmt || !marinade || !wallet.publicKey) return
+
     setLoading(true)
     try {
-      const sig = await stakeSol(connection, wallet, Number(stakeAmt))
+      const sig = await stake(
+        wallet,
+        Number(stakeAmt),
+        organizationPubkey,
+        speciesId,
+        marinade
+      )
       setTxLink(explorerTx(sig))
+      setStakeAmt('')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleWithdraw = async () => {
-    if (!withdrawAmt) return
+  const handleUnstake = async () => {
+    if (!unstakeAmt || !marinade || !wallet.publicKey) return
+
     setLoading(true)
     try {
-      const sig = await withdrawSol(connection, wallet, Number(withdrawAmt))
+      const sig = await unstake(
+        wallet,
+        Number(unstakeAmt),
+        organizationPubkey,
+        speciesId,
+        marinade
+      )
       setTxLink(explorerTx(sig))
+      setUnstakeAmt('')
     } finally {
       setLoading(false)
     }
@@ -51,30 +85,40 @@ export default function StakeWithdraw() {
         placeholder="Amount in SOL"
         value={stakeAmt}
         onChange={(e) => setStakeAmt(e.target.value)}
+        min="0"
       />
 
-      <button disabled={!wallet.publicKey || loading} onClick={handleStake}>
+      <button
+        disabled={!wallet.publicKey || !marinade || loading}
+        onClick={handleStake}
+      >
         {loading ? 'Processing…' : 'Stake & Protect'}
       </button>
 
       <div className="separator" />
 
-      <h3>Withdraw</h3>
-      <p>Your LP Balance: {lpBalance.toFixed(4)}</p>
+      <h3>Unstake mSOL</h3>
+      <p>Your Pool LP Balance: {lpBalance.toFixed(4)}</p>
 
       <input
         type="number"
-        placeholder="LP amount"
-        value={withdrawAmt}
+        placeholder="mSOL amount"
+        value={unstakeAmt}
         max={lpBalance}
-        onChange={(e) => setWithdrawAmt(e.target.value)}
+        onChange={(e) => setUnstakeAmt(e.target.value)}
+        min="0"
       />
 
       <button
-        disabled={!wallet.publicKey || loading || lpBalance === 0}
-        onClick={handleWithdraw}
+        disabled={
+          !wallet.publicKey ||
+          !marinade ||
+          loading ||
+          lpBalance === 0
+        }
+        onClick={handleUnstake}
       >
-        Withdraw
+        Unstake
       </button>
 
       {txLink && (

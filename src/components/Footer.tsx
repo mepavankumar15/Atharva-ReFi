@@ -1,5 +1,5 @@
 import { explorerAddress } from '../lib/explorer'
-import { PROGRAM_ID } from '../constants/addresses'
+import { PROGRAM_ID } from '../lib/program'
 
 export default function Footer() {
   return (

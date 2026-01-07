@@ -1,5 +1,6 @@
 import BN from 'bn.js'
 import { SystemProgram, PublicKey } from '@solana/web3.js'
+import { getAssociatedTokenAddress } from '@solana/spl-token'
 import { getProgram } from './program'
 import {
   getPoolPda,
@@ -12,18 +13,17 @@ export type MarinadeUnstakeAccounts = {
   liqPoolSolLeg: PublicKey
   liqPoolMsolLeg: PublicKey
   treasuryMsolAccount: PublicKey
-  poolMsolAccount: PublicKey
   marinadeProgram: PublicKey
 }
 
 export const unstake = async (
   wallet: any,
-  msolAmount: number, // human-readable mSOL (e.g. 0.5)
+  msolAmount: number,
   organizationPubkey: PublicKey,
   speciesId: Uint8Array,
   marinade: MarinadeUnstakeAccounts,
-  msolDecimals = 9 // confirm with MSOL_MINT (usually 9)
-) => {
+  msolDecimals = 9
+): Promise<string> => {
   if (!wallet?.publicKey) {
     throw new Error('Wallet not connected')
   }
@@ -33,11 +33,18 @@ export const unstake = async (
   const [pool] = getPoolPda(organizationPubkey, speciesId)
   const [poolVault] = getPoolVaultPda(organizationPubkey, speciesId)
 
+  // ✅ DERIVE POOL mSOL ATA (this fixes the error)
+  const poolMsolAccount = await getAssociatedTokenAddress(
+    marinade.msolMint,
+    poolVault,
+    true // PDA authority
+  )
+
   const amountInBaseUnits = new BN(
     Math.floor(msolAmount * 10 ** msolDecimals)
   )
 
-  await program.methods
+  const sig = await program.methods
     .unstake(amountInBaseUnits)
     .accounts({
       pool,
@@ -46,13 +53,12 @@ export const unstake = async (
       liqPoolSolLeg: marinade.liqPoolSolLeg,
       liqPoolMsolLeg: marinade.liqPoolMsolLeg,
       treasuryMsolAccount: marinade.treasuryMsolAccount,
-      poolMsolAccount: marinade.poolMsolAccount,
+      poolMsolAccount, // ✅ now provided correctly
       poolVault,
       systemProgram: SystemProgram.programId,
-      tokenProgram: program.provider.connection
-        ? undefined
-        : undefined, // Anchor auto-resolves; safe to omit
       marinadeProgram: marinade.marinadeProgram,
     })
     .rpc()
+
+  return sig
 }
