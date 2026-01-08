@@ -39,5 +39,5 @@ export const getProgram = (
         { commitment: 'confirmed' }
       )
 
-  return new Program<any>(ATHARVA_IDL, PROGRAM_ID, provider)
+  return new Program(ATHARVA_IDL as any, PROGRAM_ID, provider)
 }

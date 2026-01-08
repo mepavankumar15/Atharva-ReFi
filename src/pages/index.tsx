@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+import { PublicKey } from '@solana/web3.js'
 
 import Navbar from '../components/Navbar'
 import PoolOverview from '../components/PoolOverview'
@@ -11,102 +12,65 @@ import { ORGANIZATION_PUBKEY, SPECIES_ID } from '../constants/pool'
 import { fetchPoolState } from '../lib/ReadPool'
 import { loadMarinadeAccounts } from '../lib/loadMarinadeAccounts'
 import { PoolAccount } from '../types/pool'
-import { MarinadeAccounts } from '../lib/loadMarinadeAccounts'
 
 export default function Home() {
   const { connection } = useConnection()
   const wallet = useWallet()
 
   const [pool, setPool] = useState<PoolAccount | null>(null)
-  const [marinade, setMarinade] = useState<MarinadeAccounts | null>(null)
-  const [loadingPool, setLoadingPool] = useState(true)
+  const [marinade, setMarinade] = useState<any | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  // -----------------------------
-  // Load Pool (SAFE + TYPED)
-  // -----------------------------
   useEffect(() => {
-    let cancelled = false
-
-    const loadPool = async () => {
-      try {
-        const result = await fetchPoolState(
-          connection,
-          wallet,
-          ORGANIZATION_PUBKEY,
-          SPECIES_ID
-        )
-
-        if (!cancelled) {
-          setPool((result as PoolAccount) ?? null)
-        }
-      } catch {
-        if (!cancelled) setPool(null)
-      } finally {
-        if (!cancelled) setLoadingPool(false)
-      }
-    }
-
-    loadPool()
-
-    return () => {
-      cancelled = true
-    }
+    fetchPoolState(
+      connection,
+      wallet,
+      ORGANIZATION_PUBKEY,
+      SPECIES_ID
+    ).then((p) => {
+      setPool(p)
+      setLoading(false)
+    })
   }, [connection, wallet.publicKey])
 
-  // -----------------------------
-  // Load Marinade (ONCE)
-  // -----------------------------
   useEffect(() => {
     loadMarinadeAccounts(connection).then(setMarinade)
   }, [connection])
+
+  const poolReady = !!pool && !!marinade
 
   return (
     <>
       <Navbar />
 
-      <main>
-        {/* Pool Overview always visible */}
+      <main style={{ maxWidth: 900, margin: '0 auto' }}>
         <PoolOverview
           organizationPubkey={ORGANIZATION_PUBKEY}
           speciesId={SPECIES_ID}
         />
 
-        {/* Loading state */}
-        {loadingPool && (
-          <div className="card">
-            <p>Loading pool…</p>
-          </div>
-        )}
+        <StakeWithdraw
+          poolReady={poolReady}
+          poolMint={pool?.poolMint ?? null}
+          organizationPubkey={ORGANIZATION_PUBKEY}
+          speciesId={SPECIES_ID}
+          marinade={marinade}
+        />
 
-        {/* Pool NOT initialized */}
-        {!loadingPool && !pool && (
+        <ImpactPanel
+          poolReady={poolReady}
+          poolMint={pool?.poolMint ?? null}
+        />
+
+        {!poolReady && !loading && (
           <div className="card">
             <h3>Pool not initialized</h3>
             <p>
-              This conservation pool has not been created on devnet yet.
+              This conservation pool is not yet active on devnet.
+              You are viewing a preview.
             </p>
           </div>
         )}
-
-        {/* Pool initialized */}
-        {pool && marinade && (
-          <>
-            <StakeWithdraw
-              poolMint={pool.poolMint}
-              organizationPubkey={ORGANIZATION_PUBKEY}
-              speciesId={SPECIES_ID}
-              marinade={marinade}
-            />
-
-            <ImpactPanel poolMint={pool.poolMint} />
-          </>
-        )}
-
-        {/* Debug (optional, safe to remove later) */}
-        <div style={{ marginTop: 20, opacity: 0.7 }}>
-          <p>Pool loaded: {pool ? 'YES' : 'NO'}</p>
-          <p>Marinade loaded: {marinade ? 'YES' : 'NO'}</p>
-        </div>
 
         <Footer />
       </main>

@@ -13,6 +13,7 @@ type Props = {
   speciesId: Uint8Array
   marinade: MarinadeAccounts | null
   poolMint: PublicKey | null
+  poolReady: boolean
 }
 
 export default function StakeWithdraw({
@@ -20,40 +21,29 @@ export default function StakeWithdraw({
   speciesId,
   marinade,
   poolMint,
+  poolReady,
 }: Props) {
   const { connection } = useConnection()
   const wallet = useWallet()
 
   const [stakeAmt, setStakeAmt] = useState('')
   const [withdrawAmt, setWithdrawAmt] = useState('')
-  const [lpBalance, setLpBalance] = useState<number>(0)
+  const [lpBalance, setLpBalance] = useState(0)
   const [txLink, setTxLink] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const poolReady =
-    !!wallet.publicKey && !!marinade && !!organizationPubkey
-
-  // Fetch LP balance only if pool exists
   useEffect(() => {
-  if (
-    !wallet.publicKey ||
-    !poolMint ||
-    !marinade
-  ) {
-    setLpBalance(0)
-    return
-  }
+    if (!poolReady || !wallet.publicKey || !poolMint) {
+      setLpBalance(0)
+      return
+    }
 
-  getLpBalance(
-    connection,
-    wallet.publicKey,
-    poolMint
-  ).then(setLpBalance)
-}, [connection, wallet.publicKey, poolMint, marinade, txLink])
+    getLpBalance(connection, wallet.publicKey, poolMint)
+      .then(setLpBalance)
+  }, [connection, wallet.publicKey, poolMint, poolReady, txLink])
 
   const handleStake = async () => {
-    if (!stakeAmt || !wallet.publicKey || !marinade) return
-
+    if (!poolReady || !wallet.publicKey || !marinade) return
     setLoading(true)
     try {
       const sig = await stake(
@@ -71,8 +61,7 @@ export default function StakeWithdraw({
   }
 
   const handleWithdraw = async () => {
-    if (!withdrawAmt || !wallet.publicKey || !marinade) return
-
+    if (!poolReady || !wallet.publicKey || !marinade) return
     setLoading(true)
     try {
       const sig = await unstake(
@@ -91,11 +80,11 @@ export default function StakeWithdraw({
 
   return (
     <div className="card">
-      <h3>Stake & Withdraw</h3>
+      <h3>Stake SOL</h3>
 
       {!poolReady && (
         <p style={{ opacity: 0.6 }}>
-          Pool not initialized yet
+          Pool not live yet — preview mode
         </p>
       )}
 
@@ -107,21 +96,14 @@ export default function StakeWithdraw({
         disabled={!poolReady || loading}
       />
 
-      <button
-        disabled={!poolReady || loading}
-        onClick={handleStake}
-      >
-        {loading ? 'Processing…' : 'Stake SOL'}
+      <button disabled={!poolReady || loading} onClick={handleStake}>
+        Stake & Protect
       </button>
 
       <div className="separator" />
 
-      <p>
-        Your LP Balance:{' '}
-        <strong>
-          {poolReady ? lpBalance.toFixed(4) : '0.0000'}
-        </strong>
-      </p>
+      <h3>Withdraw</h3>
+      <p>Your LP Balance: {poolReady ? lpBalance.toFixed(4) : '0.0000'}</p>
 
       <input
         type="number"
@@ -139,13 +121,9 @@ export default function StakeWithdraw({
       </button>
 
       {txLink && (
-        <p style={{ marginTop: '10px' }}>
-          <a
-            href={txLink}
-            target="_blank"
-            rel="noreferrer"
-          >
-            View transaction on Explorer
+        <p>
+          <a href={txLink} target="_blank" rel="noreferrer">
+            View Transaction
           </a>
         </p>
       )}
