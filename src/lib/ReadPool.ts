@@ -11,14 +11,36 @@ export const fetchPoolState = async (
   speciesId: Uint8Array
 ): Promise<PoolAccount | null> => {
   try {
-    const program = getProgram(connection, wallet)
+    console.log('🔍 fetchPoolState called')
+
+    console.log('Organization:', organizationPubkey.toBase58())
+    console.log('SpeciesId (len):', speciesId.length)
+    console.log('SpeciesId (hex):', Buffer.from(speciesId).toString('hex'))
+ 
+console.log('🔍 RPC endpoint:', connection.rpcEndpoint)
+
+
 
     const [poolPda] = getPoolPda(organizationPubkey, speciesId)
 
-    return (await program.account.pool.fetch(
-      poolPda
-    )) as PoolAccount
-  } catch {
+    console.log('Derived Pool PDA:', poolPda.toBase58())
+
+    if (!wallet?.publicKey) {
+      console.warn('⚠️ Wallet not connected yet, skipping fetch')
+      return null
+    }
+
+    const program = getProgram(connection, wallet)
+     console.log('🔍 Reading pool from program:', program.programId.toBase58())
+    console.log('🔍 Pool PDA:', poolPda.toBase58())
+
+    const pool = await program.account.pool.fetch(poolPda)
+
+    console.log('✅ Pool account fetched:', pool)
+
+    return pool as PoolAccount
+  } catch (err) {
+    console.error('❌ fetchPoolState failed:', err)
     return null
   }
 }
