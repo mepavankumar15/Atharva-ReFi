@@ -39,5 +39,9 @@ export const getProgram = (
         { commitment: 'confirmed' }
       )
 
-  return new Program(ATHARVA_IDL as any, PROGRAM_ID, provider)
+  return new Program({
+    ...ATHARVA_IDL,
+    address : PROGRAM_ID.toBase58(),
+
+  } as any, provider)
 }

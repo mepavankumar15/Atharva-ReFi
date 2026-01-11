@@ -14,8 +14,7 @@ export const fetchPoolState = async (
     console.log('🔍 fetchPoolState called')
 
     console.log('Organization:', organizationPubkey.toBase58())
-    console.log('SpeciesId (len):', speciesId.length)
-    console.log('SpeciesId (hex):', Buffer.from(speciesId).toString('hex'))
+    
  
 console.log('🔍 RPC endpoint:', connection.rpcEndpoint)
 
@@ -34,9 +33,12 @@ console.log('🔍 RPC endpoint:', connection.rpcEndpoint)
      console.log('🔍 Reading pool from program:', program.programId.toBase58())
     console.log('🔍 Pool PDA:', poolPda.toBase58())
 
-    const pool = await program.account.pool.fetch(poolPda)
+    const accountNamespace = program.account as any
 
+    const pool = await accountNamespace.pool.fetch(poolPda)
+    console.log('Account namespace:', program.account)
     console.log('✅ Pool account fetched:', pool)
+    console.log(Object.keys(program.account))
 
     return pool as PoolAccount
   } catch (err) {

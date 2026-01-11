@@ -93,7 +93,7 @@ export default function StakeWithdraw({
         placeholder="Amount in SOL"
         value={stakeAmt}
         onChange={(e) => setStakeAmt(e.target.value)}
-        disabled={!poolReady || loading}
+        disabled={loading}
       />
 
       <button disabled={!poolReady || loading} onClick={handleStake}>
@@ -110,7 +110,7 @@ export default function StakeWithdraw({
         placeholder="LP amount"
         value={withdrawAmt}
         onChange={(e) => setWithdrawAmt(e.target.value)}
-        disabled={!poolReady || loading}
+        disabled={loading}
       />
 
       <button

@@ -29,8 +29,7 @@ export default function PoolOverview({
         organizationPubkey,
         speciesId
       )
-
-      setPool(result ?? null)
+      setPool(result)
     } finally {
       setLoading(false)
     }
@@ -39,48 +38,39 @@ export default function PoolOverview({
   useAutoRefresh(refresh)
 
   // -------------------------
-  // POOL NOT INITIALIZED
+  // AUTHORITATIVE FLAGS
   // -------------------------
-  const poolInitialized =
-    pool &&
-    typeof pool === 'object' &&
-    'totalDeposits' in pool &&
-    'organizationYieldBps' in pool
+  const poolExists = !!pool
+  const poolLive = poolExists && pool.is_active === true
 
   // -------------------------
-  // DUMMY VALUES
+  // VALUES (REAL OR FALLBACK)
   // -------------------------
-  const totalStakedSol = poolInitialized
+  const totalStakedSol = poolExists
     ? Number(pool.totalDeposits) / 1e9
     : 0
 
-  const yieldBps = poolInitialized
+  const yieldBps = poolExists
     ? pool.organizationYieldBps
-    : 20 // default dummy %
+    : 20
 
-  const vault = poolInitialized && pool.vault
+  const vault = poolExists
     ? pool.vault.toBase58()
     : null
 
-  const speciesName = poolInitialized && pool.speciesName
+  const speciesName = poolExists
     ? pool.speciesName
-    : 'Conservation Pool (Not Live Yet)'
+    : 'Conservation Pool'
 
   // -------------------------
   // ANIMATIONS
   // -------------------------
   const animatedStaked = useAnimatedNumber(totalStakedSol)
-
-  const userPct = 100 - yieldBps
-  const conservationPct = yieldBps
-
-  const animatedUserPct = useAnimatedNumber(userPct)
-  const animatedConservationPct = useAnimatedNumber(conservationPct)
+  const animatedUserPct = useAnimatedNumber(100 - yieldBps)
+  const animatedConservationPct = useAnimatedNumber(yieldBps)
 
   return (
     <div className="card">
-      <h3>{speciesName}</h3>
-
       {loading && (
         <>
           <div className="skeleton skeleton-line" />
@@ -91,11 +81,13 @@ export default function PoolOverview({
 
       {!loading && (
         <>
+          
+
           <p>
             Total Staked:{' '}
             <strong>
               {animatedStaked.toFixed(2)} SOL
-              {!poolInitialized && ' (preview)'}
+              {!poolExists && ' (preview)'}
             </strong>
           </p>
 
@@ -109,9 +101,15 @@ export default function PoolOverview({
             </strong>
           </p>
 
-          {!poolInitialized && (
+          {!poolExists && (
             <p style={{ color: '#9290C3' }}>
-              Pool not initialized on-chain yet
+              Pool account not found on-chain yet
+            </p>
+          )}
+
+          {poolExists && !poolLive && (
+            <p style={{ color: '#FFA726' }}>
+              Pool exists but is currently inactive
             </p>
           )}
 

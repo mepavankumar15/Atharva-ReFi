@@ -36,8 +36,15 @@ export default function Home() {
   useEffect(() => {
     loadMarinadeAccounts(connection).then(setMarinade)
   }, [connection])
+  useEffect(() => {
+  console.log('POOL AUTO-DETECT:', {
+    pool,
+    marinadeLoaded: !!marinade,
+    wallet: wallet.publicKey?.toBase58(),
+  })
+}, [pool, marinade, wallet.publicKey])
 
-  const poolReady = !!pool && !!marinade
+  const poolReady = !!pool && !!marinade && !!wallet.publicKey
 
   return (
     <>
@@ -48,6 +55,22 @@ export default function Home() {
           organizationPubkey={ORGANIZATION_PUBKEY}
           speciesId={SPECIES_ID}
         />
+
+                  {!wallet.publicKey && (
+            <p style={{ opacity: 0.6 }}>Connect wallet to continue</p>
+          )}
+
+          {wallet.publicKey && !poolReady && (
+            <p style={{ opacity: 0.6 }}>
+              Detecting pool on-chain…
+            </p>
+          )}
+
+          {poolReady && (
+            <p style={{ color: '#7CFF7C' }}>
+              Pool live ✔
+            </p>
+          )}
 
         <StakeWithdraw
           poolReady={poolReady}
